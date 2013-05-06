@@ -21,7 +21,7 @@ int make_socket()
  server.sin_family = AF_INET;
  server.sin_addr.s_addr = htonl(INADDR_ANY);
  server.sin_port = htons(PORT_NUMBER);
- w_bind(socket_fd, (struct sockaddr_in *)&server, sizeof(server));
+ w_bind(socket_fd, (struct sockaddr *)&server, sizeof(server));
 
  return socket_fd;
 }
@@ -77,16 +77,16 @@ int broadcast_myself(int socket_fd)
 
   msg = construct_msg(NAME_MSG, NULL);
   tm.msg = *msg;
-  printf("user_name : %s Ip : %s\n", tm.msg.msg.nm.name, tm.msg.msg.nm.ip);
+  //printf("user_name : %s Ip : %s\n", tm.msg.msg.nm.name, tm.msg.msg.nm.ip);
   if ((numbytes = sendto(socket_fd, tm.string, sizeof(union transport_msg),
           0, (struct sockaddr *)&b_addr, sizeof(b_addr))) == -1)
   {
     perror("sendto");
     exit(1);
   }
-  printf("numbytes %d size_of transport_msg %d\n", numbytes, 
-      sizeof(union transport_msg));
-  free(msg);
+  //printf("numbytes %d size_of transport_msg %d\n", numbytes, 
+  //    sizeof(union transport_msg));
+  destory_msg(msg); 
   
   return 1;
 }

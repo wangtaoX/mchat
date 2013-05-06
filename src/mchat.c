@@ -1,8 +1,11 @@
 #include <pthread.h>
 #include <unistd.h>
+#include <stdlib.h>
 #include "user.h"
 #include "msg.h"
 #include "socket.h"
+#include "pstring.h"
+
 
 extern char user_name[DEFAULT_NAME_SIZE];
 extern struct sockaddr_in b_addr, m_addr;
@@ -22,8 +25,8 @@ int initialization()
   m_addr = get_myself_addr(sfd);
   parse_user_info();
   initialization_myself();
-  printf("broadcast addresss: %s\n", inet_ntoa(b_addr.sin_addr));
-  printf("myself    addresss: %s\n", inet_ntoa(m_addr.sin_addr));
+  //printf("broadcast addresss: %s\n", inet_ntoa(b_addr.sin_addr));
+  //printf("myself    addresss: %s\n", inet_ntoa(m_addr.sin_addr));
   
   return sfd;
 }
@@ -71,7 +74,7 @@ void *socket_handler(void *arg)
   //        default:
   //          break;
   //      }
-        printf("user_name : %s, Ip : %s\n", tm.msg.msg.nm.name, tm.msg.msg.nm.ip);
+        printf("user_name : %s, Ip : %s\n", tm.msg.msg.nm->name, tm.msg.msg.nm->ip);
    //   }
    // }/* end of socket readable */
   }/* end of main loop */
@@ -83,6 +86,8 @@ int main(int argc, char *argv[])
   struct sockaddr_in b_addr, m_addr;
   pthread_t t;
 
+  system("reset");
+  fprintf(stdout, welcome_str);
   sfd = initialization(); 
   broadcast_myself(sfd);
   pthread_create(&t, NULL, socket_handler, (void *)&sfd);

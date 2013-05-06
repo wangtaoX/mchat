@@ -21,6 +21,13 @@ static bool user_less_func(const struct hash_elem *u1,
 
   return strcmp(u1_->user_name, u2_->user_name) < 0 ? 1 : 0;
 }
+/* hash function of user friends */
+static unsigned hash_user_func(const struct hash_elem *e, void *aux)
+{
+  struct user *u = hash_entry(e, struct user, user_hash_e);
+
+  return hash_bytes(u->user_name, strlen(u->user_name));
+}
 
 /* convert a name message to an user information */
 static inline struct user *name_msg_to_user(struct name_msg nm)
@@ -41,7 +48,7 @@ void initialization_myself()
   strcpy(myself.user_name, user_name);
   myself.user_ss = *((struct sockaddr_storage *)&m_addr);
 
-  hash_init(&user_friends, NULL, NULL, NULL);
+  hash_init(&user_friends, hash_user_func, user_less_func, NULL);
 }
 
 bool is_friends(char *name)

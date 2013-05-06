@@ -50,9 +50,9 @@ struct msg
                  eg : name message...*/
   union
   {
-    struct name_msg nm;
-    struct msg_msg mm;
-    struct group_crl_msg gcm;
+    struct name_msg *nm;
+    struct msg_msg *mm;
+    struct group_crl_msg *gcm;
   }msg;
 };
 
@@ -72,4 +72,5 @@ struct unreaded_msg
 
 /* construct a message */
 struct msg *construct_msg(int msg_type, char *msg);
+void destory_msg(struct msg *msg);
 #endif
