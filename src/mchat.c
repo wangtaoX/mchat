@@ -40,6 +40,7 @@ void *socket_handler(void *arg)
   int numbytes;
   socklen_t addr_len;
   struct sockaddr_in their_addr;
+  struct msg message;
   
   /* listener thread main loop */
   for (;;)
@@ -61,20 +62,20 @@ void *socket_handler(void *arg)
           perror("recvfrom");
           exit(0);
         }
-  //      message = resolve_message(tm);
-  //      switch(message.msg_type)
-  //      {
-  //        case NAME_MSG:
-  //          add_friends();
-  //          break;
-  //        case GROUP_MSG:
-  //          break;
-  //        case MSG_MSG:
-  //          break;
-  //        default:
-  //          break;
-  //      }
-        printf("user_name : %s, Ip : %s\n", tm.msg.msg.nm->name, tm.msg.msg.nm->ip);
+        message = resolve_message(tm);
+        switch(message.msg_type)
+        {
+          case NAME_MSG:
+            add_friends(message.msg.nm);
+            break;
+          case GROUP_MSG:
+            break;
+          case MSG_MSG:
+            break;
+          default:
+            break;
+        }
+   //     printf("user_name : %s, Ip : %s\n", tm.msg.msg.nm->name, tm.msg.msg.nm->ip);
    //   }
    // }/* end of socket readable */
   }/* end of main loop */
@@ -87,7 +88,7 @@ int main(int argc, char *argv[])
   pthread_t t;
 
   system("reset");
-  fprintf(stdout, welcome_str);
+  print_bannar();
   sfd = initialization(); 
   broadcast_myself(sfd);
   pthread_create(&t, NULL, socket_handler, (void *)&sfd);

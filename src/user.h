@@ -26,12 +26,16 @@ struct user
   char user_name[DEFAULT_NAME_SIZE];
   struct sockaddr_storage user_ss;
   struct hash_elem user_hash_e;
+  bool in_chatting;
 };
 
 void initialization_myself();
-int add_friends(struct name_msg nm);
+int add_friends(struct name_msg *nm);
 bool is_friends(char *name);
 int delete_friends(char *name);
 struct user *search_friends(char *name);
 size_t friends_cnt();
+bool is_inchatting(char *name);
+bool is_myself(char *ip);
+
 #endif

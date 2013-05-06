@@ -30,14 +30,15 @@ static unsigned hash_user_func(const struct hash_elem *e, void *aux)
 }
 
 /* convert a name message to an user information */
-static inline struct user *name_msg_to_user(struct name_msg nm)
+static inline struct user *name_msg_to_user(struct name_msg *nm)
 {
   struct user *new_user = malloc(sizeof(struct user));
   struct sockaddr_in *si = (struct sockaddr_in *)&(new_user->user_ss);
 
   initialization_new_user(new_user);
-  strcpy(new_user->user_name, nm.name);
-  inet_aton(nm.ip, &(si->sin_addr));
+  strcpy(new_user->user_name, nm->name);
+  inet_aton(nm->ip, &(si->sin_addr));
+  new_user->in_chatting = false;
 
   return new_user;
 }
@@ -76,13 +77,16 @@ struct user *search_friends(char *name)
 }
 
 /* add an user into hash table */
-int add_friends(struct name_msg nm)
+int add_friends(struct name_msg *nm)
 {
   struct user *new_user;
 
+  /* ourself should not be in hash table */
+  if (is_myself(nm->ip))
+    return -1;
   new_user = name_msg_to_user(nm);
 
-  if (!is_friends(nm.name))
+  if (!is_friends(nm->name))
     hash_insert(&user_friends, &new_user->user_hash_e);
   else
     return -1;
@@ -111,4 +115,26 @@ int delete_friends(char *name)
 size_t friends_cnt()
 {
   return hash_size(&user_friends);
+}
+
+bool is_inchatting(char *name)
+{
+  struct user *user = search_friends(name);
+  
+  return user->in_chatting;
+}
+
+/* return true if ip string is equal to sin_addr */
+bool is_myself(char *ip)
+{
+  if (ip == NULL)
+    return false;
+
+  if (strcmp(ip, inet_ntoa(m_addr.sin_addr)) == 0)
+  {
+//    printf("got myself, aha\n");
+    return true;
+  }
+
+  return false;
 }

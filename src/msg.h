@@ -73,4 +73,5 @@ struct unreaded_msg
 /* construct a message */
 struct msg *construct_msg(int msg_type, char *msg);
 void destory_msg(struct msg *msg);
+struct msg resolve_message(union transport_msg tm);
 #endif
