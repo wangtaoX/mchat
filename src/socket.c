@@ -72,11 +72,11 @@ struct sockaddr_in get_myself_addr(int socket_fd)
 int broadcast_myself(int socket_fd)
 {
   union transport_msg tm;
-  struct msg msg;
+  struct msg *msg;
   int numbytes;
 
   msg = construct_msg(NAME_MSG, NULL);
-  tm.msg = msg;
+  tm.msg = *msg;
   printf("user_name : %s Ip : %s\n", tm.msg.msg.nm.name, tm.msg.msg.nm.ip);
   if ((numbytes = sendto(socket_fd, tm.string, sizeof(union transport_msg),
           0, (struct sockaddr *)&b_addr, sizeof(b_addr))) == -1)
@@ -86,6 +86,7 @@ int broadcast_myself(int socket_fd)
   }
   printf("numbytes %d size_of transport_msg %d\n", numbytes, 
       sizeof(union transport_msg));
+  free(msg);
   
   return 1;
 }

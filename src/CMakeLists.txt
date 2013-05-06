@@ -1,5 +1,5 @@
 FIND_PACKAGE(Threads)
-SET(SRC socket.c mchat.c msg.c ../lib/wfun.c ../lib/debug.c
+SET(SRC socket.c mchat.c msg.c user.c ../lib/wfun.c ../lib/debug.c
     ../lib/hash.c ../lib/list.c)
 ADD_EXECUTABLE(mchat ${SRC})
 INCLUDE_DIRECTORIES(../lib)

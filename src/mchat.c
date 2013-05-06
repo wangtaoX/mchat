@@ -1,4 +1,5 @@
 #include <pthread.h>
+#include <unistd.h>
 #include "user.h"
 #include "msg.h"
 #include "socket.h"
@@ -8,8 +9,7 @@ extern struct sockaddr_in b_addr, m_addr;
 
 static void parse_user_info()
 {
-  strcpy(user_name, "Dream");
-  printf("user_name : %s\n", user_name);
+  gethostname(user_name, DEFAULT_NAME_SIZE);
 }
 
 /* user info initialization */
@@ -21,6 +21,7 @@ int initialization()
   b_addr = get_broadcast_addr(sfd);
   m_addr = get_myself_addr(sfd);
   parse_user_info();
+  initialization_myself();
   printf("broadcast addresss: %s\n", inet_ntoa(b_addr.sin_addr));
   printf("myself    addresss: %s\n", inet_ntoa(m_addr.sin_addr));
   
@@ -30,8 +31,8 @@ int initialization()
 void *socket_handler(void *arg)
 {
   int socket_fd = *((int *)arg);
-  fd_set read_fds;
-  int i = 0;
+  //fd_set read_fds;
+  //int i = 0;
   union transport_msg tm;
   int numbytes;
   socklen_t addr_len;
@@ -57,6 +58,19 @@ void *socket_handler(void *arg)
           perror("recvfrom");
           exit(0);
         }
+  //      message = resolve_message(tm);
+  //      switch(message.msg_type)
+  //      {
+  //        case NAME_MSG:
+  //          add_friends();
+  //          break;
+  //        case GROUP_MSG:
+  //          break;
+  //        case MSG_MSG:
+  //          break;
+  //        default:
+  //          break;
+  //      }
         printf("user_name : %s, Ip : %s\n", tm.msg.msg.nm.name, tm.msg.msg.nm.ip);
    //   }
    // }/* end of socket readable */
