@@ -2,10 +2,10 @@
 #define __MSG_H
 
 #include <sys/types.h>
-#include <string.h>
 #include "user.h"
 #include "../lib/wfun.h"
 #include "../lib/list.h"
+#include "../lib/string.h"
 
 /* the length of user name */
 #define DEFAULT_NAME_SIZE 20

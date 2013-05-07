@@ -36,7 +36,7 @@ static inline struct user *name_msg_to_user(struct name_msg *nm)
   struct sockaddr_in *si = (struct sockaddr_in *)&(new_user->user_ss);
 
   initialization_new_user(new_user);
-  strcpy(new_user->user_name, nm->name);
+  strlcpy(new_user->user_name, nm->name, DEFAULT_NAME_SIZE);
   inet_aton(nm->ip, &(si->sin_addr));
   new_user->in_chatting = false;
 
@@ -46,7 +46,7 @@ static inline struct user *name_msg_to_user(struct name_msg *nm)
 /* here, should be rewrite */
 void initialization_myself()
 {
-  strcpy(myself.user_name, user_name);
+  strlcpy(myself.user_name, user_name, DEFAULT_NAME_SIZE);
   myself.user_ss = *((struct sockaddr_storage *)&m_addr);
 
   hash_init(&user_friends, hash_user_func, user_less_func, NULL);
@@ -67,7 +67,7 @@ struct user *search_friends(char *name)
   struct user res;
   struct hash_elem *e;
 
-  strcpy(res.user_name, name);
+  strlcpy(res.user_name, name, DEFAULT_NAME_SIZE);
   e = hash_find(&user_friends, &res.user_hash_e);
 
   if (e != NULL)

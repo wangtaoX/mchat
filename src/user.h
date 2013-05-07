@@ -2,12 +2,12 @@
 #define __USER_H
 
 #include <netinet/in.h>
-#include <string.h>
 #include <stdbool.h>
 #include "msg.h"
 #include "socket.h"
 #include "../lib/list.h"
 #include "../lib/hash.h"
+#include "../lib/string.h"
 
 #ifndef DEFAULT_NAME_SIZE
 #define DEFAULT_NAME_SIZE 20

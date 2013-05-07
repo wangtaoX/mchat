@@ -16,8 +16,8 @@ static struct msg *construct_name_msg()
   struct msg *msg = malloc(sizeof(struct msg));
   
   msg->msg.nm = malloc(sizeof(struct name_msg));
-  strcpy(msg->msg.nm->name, user_name);
-  strcpy(msg->msg.nm->ip, inet_ntoa(m_addr.sin_addr));
+  strlcpy(msg->msg.nm->name, user_name, DEFAULT_NAME_SIZE);
+  strlcpy(msg->msg.nm->ip, inet_ntoa(m_addr.sin_addr), INET_ADDRSTRLEN);
   msg->msg_type = NAME_MSG;
   
   return msg;
@@ -30,8 +30,8 @@ static struct msg_msg *__msg_msg(char *msg)
   struct msg_msg *mm = (struct msg_msg *)malloc(sizeof(struct msg_msg) + length);
 
   mm->length = length;
-  strcpy(mm->name, user_name);
-  strcpy(mm->msg, msg);
+  strlcpy(mm->name, user_name, DEFAULT_NAME_SIZE);
+  strlcpy(mm->msg, msg, length);
 
   return mm;
 }

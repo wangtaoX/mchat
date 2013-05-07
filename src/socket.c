@@ -33,7 +33,7 @@ struct sockaddr_in get_broadcast_addr(int socket_fd)
   struct ifreq ifr;
 
   bzero(&ifr, sizeof(ifr));
-  strcpy(ifr.ifr_name, "eth0");
+  strlcpy(ifr.ifr_name, "eth0", 5);
   if (ioctl(socket_fd, SIOCGIFBRDADDR, &ifr) < 0)
   {
     perror("ioctl");
@@ -53,7 +53,7 @@ struct sockaddr_in get_myself_addr(int socket_fd)
   struct ifreq ifr;
 
   bzero(&ifr, sizeof(ifr));
-  strcpy(ifr.ifr_name, "eth0");
+  strlcpy(ifr.ifr_name, "eth0", 5);
   if (ioctl(socket_fd, SIOCGIFADDR, &ifr) < 0)
   {
     perror("ioctl");
