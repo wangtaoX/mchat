@@ -62,6 +62,7 @@ void *socket_handler(void *arg)
         //    break;
         //}
     printf("receive: user name[%s] ip[%s]\n", msg->header.name, msg->header.ip);
+    destory_message(msg);
   }/* end of main loop */
 }
 
@@ -113,6 +114,10 @@ int main(int argc, char *argv[])
   char args[MAX_MSG_SIZE + 32];
   bool quitting = false;
   struct args *opt;
+  union tran_message tm;
+  struct user *reciver;
+  message *msg;
+  int length;
 
   system("reset");
   print_bannar();
@@ -133,7 +138,18 @@ int main(int argc, char *argv[])
         dump_all_online_friends();
         break;
       case 's':
-//        send_message(args);
+        msg = construct_msg(MSG_MSG, opt->arg2);
+        length = sizeof(message) + strlen(opt->arg2);
+        memcpy((void *)&tm, (void *)msg, length);
+
+        reciver = search_friends(opt->arg1);
+        if (reciver == NULL)
+        {
+          fprintf(stdout, "No such friends, Please check ;)\n");
+          destory_message(msg);
+        }
+        send_message(sfd, &tm, &length, 
+            (struct sockaddr *)&reciver->user_ss);
         break;
       case 'q':
         print_goodbye();

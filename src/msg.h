@@ -3,6 +3,7 @@
 
 #include <sys/types.h>
 #include "user.h"
+#include "args.h"
 #include "../lib/wfun.h"
 #include "../lib/list.h"
 #include "../lib/string.h"
