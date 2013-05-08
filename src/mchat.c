@@ -40,48 +40,28 @@ int initialization()
 void *socket_handler(void *arg)
 {
   int socket_fd = *((int *)arg);
-  union transport_msg tm;
   int numbytes;
-  socklen_t addr_len;
-  struct sockaddr_in their_addr;
-  struct msg message;
+  message *msg;
+  char buf[MAX_MSG_SIZE];
+  union tran_message buffer;
   
   /* listener thread main loop */
   for (;;)
   {
-  //  FD_SET(socket_fd, &read_fds);
-  //  if (select(socket_fd + 1, &read_fds, NULL, NULL, NULL) == -1)
-  //  {
-  //    perror("select");
-  //    exit(0);
-  //  }
-  //  for (; i<=socket_fd; i++)
-  //  {
-  //    if (FD_ISSET(i, &read_fds)) {
-        // handle data
-        addr_len = sizeof(their_addr);
-        if ((numbytes = recvfrom(socket_fd, tm.string, sizeof(union transport_msg),
-              0, (struct sockaddr *)&their_addr, &addr_len)) == -1)
-        {
-          perror("recvfrom");
-          exit(0);
-        }
-        message = resolve_message(tm);
-        switch(message.msg_type)
-        {
-          case NAME_MSG:
-            add_friends(message.msg.nm);
-            break;
-          case GROUP_MSG:
-            break;
-          case MSG_MSG:
-            break;
-          default:
-            break;
-        }
-   //     printf("user_name : %s, Ip : %s\n", tm.msg.msg.nm->name, tm.msg.msg.nm->ip);
-   //   }
-   // }/* end of socket readable */
+    msg = receive_message(socket_fd);
+        //switch(message.msg_type)
+        //{
+        //  case NAME_MSG:
+        //    add_friends(message.msg.nm);
+        //    break;
+        //  case GROUP_MSG:
+        //    break;
+        //  case MSG_MSG:
+        //    break;
+        //  default:
+        //    break;
+        //}
+    printf("receive: user name[%s] ip[%s]\n", msg->header.name, msg->header.ip);
   }/* end of main loop */
 }
 
@@ -147,22 +127,25 @@ int main(int argc, char *argv[])
     opt = parse_option(args);
     if (opt == NULL)
       continue;
-    switch(args->command) 
+    switch(opt->command) 
     {
       case 'l':
         dump_all_online_friends();
         break;
       case 's':
-        send_message(args);
+//        send_message(args);
         break;
       case 'q':
         print_goodbye();
         quitting = true;
         break;
+      case 'h':
+        print_help();
+        break;
       default:
+        fprintf(stdout, "Uknown option, Please use h(help) to get help ;)\n");
         break;
     }
-    printf("args->command %c\n", opt->command);
     if (quitting)
       break;
   }

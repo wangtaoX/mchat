@@ -3,15 +3,16 @@
 
 #include <netinet/in.h>
 #include <stdbool.h>
-#include "msg.h"
 #include "socket.h"
 #include "../lib/list.h"
 #include "../lib/hash.h"
 #include "../lib/string.h"
+#include "msg.h"
 
 #ifndef DEFAULT_NAME_SIZE
 #define DEFAULT_NAME_SIZE 20
 #endif
+typedef struct msg message;
 
 /* basic information  */
 char user_name[DEFAULT_NAME_SIZE];
@@ -29,13 +30,13 @@ struct user
   bool in_chatting;
 };
 
+int add_friends(message *mm);
 void initialization_myself();
-int add_friends(struct name_msg *nm);
 bool is_friends(char *name);
 int delete_friends(char *name);
 struct user *search_friends(char *name);
 size_t friends_cnt();
 bool is_inchatting(char *name);
 bool is_myself(char *ip);
-
+void dump_all_online_friends();
 #endif

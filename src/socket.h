@@ -20,6 +20,5 @@ struct sockaddr_in get_myself_addr(int socket_fd);
 
 /* broadcast a message */
 int broadcast_myself(int socket_fd);
-
-
+int send_to_all(int s, char *buf, int *len);
 #endif
