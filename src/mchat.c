@@ -49,19 +49,19 @@ void *socket_handler(void *arg)
   for (;;)
   {
     msg = receive_message(socket_fd);
-        //switch(message.msg_type)
-        //{
-        //  case NAME_MSG:
-        //    add_friends(message.msg.nm);
-        //    break;
-        //  case GROUP_MSG:
-        //    break;
-        //  case MSG_MSG:
-        //    break;
-        //  default:
-        //    break;
-        //}
-    printf("receive: user name[%s] ip[%s]\n", msg->header.name, msg->header.ip);
+    switch(msg->header.type)
+    {
+      case NAME_MSG:
+        add_friends(msg);
+        break;
+      case GROUP_MSG:
+        break;
+      case MSG_MSG:
+        break;
+      default:
+        break;
+    }
+    //printf("receive: user name[%s] ip[%s]\n", msg->header.name, msg->header.ip);
     destory_message(msg);
   }/* end of main loop */
 }
@@ -159,7 +159,7 @@ int main(int argc, char *argv[])
         print_help();
         break;
       default:
-        fprintf(stdout, "Uknown option, Please use h(help) to get help ;)\n");
+        fprintf(stdout, "Unknown option, Please use h(help) to get help ;)\n");
         break;
     }
     if (quitting)

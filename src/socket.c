@@ -85,7 +85,7 @@ int broadcast_myself(int socket_fd)
     perror("sendto");
     exit(1);
   }
-  printf("broadcast: user name[%s] ip[%s]\n", msg->header.name, msg->header.ip);
+  //printf("broadcast: user name[%s] ip[%s]\n", msg->header.name, msg->header.ip);
   //printf("numbytes %d size_of transport_msg %d\n", numbytes, 
   //    sizeof(union transport_msg));
   destory_message(msg); 
