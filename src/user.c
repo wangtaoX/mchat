@@ -30,14 +30,14 @@ static unsigned hash_user_func(const struct hash_elem *e, void *aux)
 }
 
 /* convert a name message to an user information */
-static inline struct user *name_msg_to_user(struct name_msg *nm)
+static inline struct user *name_msg_to_user(message *msg)
 {
   struct user *new_user = malloc(sizeof(struct user));
   struct sockaddr_in *si = (struct sockaddr_in *)&(new_user->user_ss);
 
   initialization_new_user(new_user);
-  strlcpy(new_user->user_name, nm->name, DEFAULT_NAME_SIZE);
-  inet_aton(nm->ip, &(si->sin_addr));
+  strlcpy(new_user->user_name, msg->header.name, DEFAULT_NAME_SIZE);
+  inet_aton(msg->header.ip, &(si->sin_addr));
   new_user->in_chatting = false;
 
   return new_user;
@@ -77,16 +77,16 @@ struct user *search_friends(char *name)
 }
 
 /* add an user into hash table */
-int add_friends(struct name_msg *nm)
+int add_friends(message *mm)
 {
   struct user *new_user;
 
   /* ourself should not be in hash table */
-  if (is_myself(nm->ip))
+  if (is_myself(mm->header.ip))
     return -1;
-  new_user = name_msg_to_user(nm);
+  new_user = name_msg_to_user(mm);
 
-  if (!is_friends(nm->name))
+  if (!is_friends(mm->header.name))
     hash_insert(&user_friends, &new_user->user_hash_e);
   else
     return -1;
@@ -137,4 +137,29 @@ bool is_myself(char *ip)
   }
 
   return false;
+}
+
+/* print all online user */
+void dump_all_online_friends()
+{
+  struct hash_iterator i;
+  struct user *u;
+  struct sockaddr_in *si;
+
+  if (hash_empty(&user_friends))
+  {
+    fprintf(stdout, "No friends online ;(\n");
+    return;
+  }
+  fprintf(stdout, "User Name\tIP\n");
+  /* iterate all friends in hash table */
+  hash_first(&i, &user_friends);
+  while(hash_next(&i))
+  {
+    u = hash_entry(hash_cur(&i), struct user, user_hash_e);
+    si = (struct sockaddr_in *)(&u->user_ss);
+    fprintf(stdout, "%s\t\t%s\n", u->user_name, inet_ntoa(si->sin_addr));
+  }
+  
+  return;
 }

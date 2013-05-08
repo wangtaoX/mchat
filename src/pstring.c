@@ -4,8 +4,8 @@
 const char *welcome_str =  "Welcome to the use mchat server,\
  Use -h to get the help documentation\n";
 
-const char *help = "-l list all online friends\n \
--s [[name][ip]] [msg] send a message to a friend\n ";
+const char *help = "-l list all online friends\n\
+-s [[name][ip]] [msg] send a message to a friend\n";
 
 void print_help()
 {
@@ -15,4 +15,8 @@ void print_help()
 void print_bannar()
 {
   fprintf(stdout, welcome_str);
+}
+void print_goodbye()
+{
+  fprintf(stdout, "Goodbye ;)\n");
 }

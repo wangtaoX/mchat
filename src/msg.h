@@ -3,6 +3,7 @@
 
 #include <sys/types.h>
 #include "user.h"
+#include "args.h"
 #include "../lib/wfun.h"
 #include "../lib/list.h"
 #include "../lib/string.h"
@@ -19,59 +20,32 @@
 
 /* any unreaded message should be in a list */
 struct list unreaded_msg_list;
-/* new user should broadcast this kind of msg */
-struct name_msg
+
+struct msg_header 
 {
   char name[DEFAULT_NAME_SIZE];
+  int  type;
   char ip[INET_ADDRSTRLEN];
-};
-
-/* message between users */
-struct msg_msg
-{
   time_t time;
-  char name[DEFAULT_NAME_SIZE];
   int length;
-  char msg[0];  //zero length array here 
 };
 
-/* group control msg */
-struct group_crl_msg
+typedef struct msg
 {
-  char flags;
-  char g_name[DEFAULT_NAME_SIZE];
-};
+  struct msg_header header;
+  char msg[0];
+}message;
 
-
-/* all kinds of msg shuold be in one */
-struct msg
+union tran_message
 {
-  int msg_type; /*the type of this msg
-                 eg : name message...*/
-  union
-  {
-    struct name_msg *nm;
-    struct msg_msg *mm;
-    struct group_crl_msg *gcm;
-  }msg;
-};
-
-/* when transport a message between users */
-union transport_msg
-{
-  struct msg msg;
-  char string[MAX_MSG_SIZE];
-};
-
-/* unreaded message */
-struct unreaded_msg
-{
-  struct list_elem unreaded_list_elem;
-  struct msg_msg message;
+  message msg;
+  char str[MAX_MSG_SIZE];
 };
 
 /* construct a message */
-struct msg *construct_msg(int msg_type, char *msg);
-void destory_msg(struct msg *msg);
-struct msg resolve_message(union transport_msg tm);
+message *construct_msg(int type, char *msg);
+void destory_message(message *msg);
+int send_message(int socket, union tran_message *buffer, 
+    int *length, struct sockaddr *addr);
+message *receive_message(int socket);
 #endif

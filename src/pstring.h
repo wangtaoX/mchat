@@ -3,4 +3,5 @@
 
 void print_help();
 void print_bannar();
+void print_goodbye();
 #endif

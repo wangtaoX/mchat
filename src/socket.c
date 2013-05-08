@@ -71,22 +71,24 @@ struct sockaddr_in get_myself_addr(int socket_fd)
  * online users*/
 int broadcast_myself(int socket_fd)
 {
-  union transport_msg tm;
-  struct msg *msg;
+  union tran_message tm;
+  message *msg;
   int numbytes;
+  int length;
 
   msg = construct_msg(NAME_MSG, NULL);
   tm.msg = *msg;
-  //printf("user_name : %s Ip : %s\n", tm.msg.msg.nm.name, tm.msg.msg.nm.ip);
-  if ((numbytes = sendto(socket_fd, tm.string, sizeof(union transport_msg),
-          0, (struct sockaddr *)&b_addr, sizeof(b_addr))) == -1)
+  length = sizeof(message);
+  if ((numbytes = send_message(socket_fd, &tm, &length, 
+          (struct sockaddr *)&b_addr) == -1))
   {
     perror("sendto");
     exit(1);
   }
+  //printf("broadcast: user name[%s] ip[%s]\n", msg->header.name, msg->header.ip);
   //printf("numbytes %d size_of transport_msg %d\n", numbytes, 
   //    sizeof(union transport_msg));
-  destory_msg(msg); 
+  destory_message(msg); 
   
   return 1;
 }
