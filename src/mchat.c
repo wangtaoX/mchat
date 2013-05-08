@@ -7,6 +7,7 @@
 #include "pstring.h"
 #include "../lib/string.h"
 
+/* arguments when user input */
 typedef struct args
 {
   char command;
@@ -15,10 +16,14 @@ typedef struct args
   char arg2[0];
 }args;
 
+/* information about myself */
 extern char user_name[DEFAULT_NAME_SIZE];
 extern struct sockaddr_in b_addr, m_addr;
 
-static void parse_user_info()
+static void parse_user_info();
+static inline void get_user_input(char *s, int length);
+
+static inline void parse_user_info()
 {
   gethostname(user_name, DEFAULT_NAME_SIZE);
 }
@@ -52,14 +57,11 @@ void *socket_handler(void *arg)
     switch(msg->header.type)
     {
       case NAME_MSG:
-        printf("recieve Name_Msg\n");
         add_friends(msg);
         break;
       case GROUP_MSG:
-        printf("receive Group_Msg\n");
         break;
       case MSG_MSG:
-        printf("receive Msg_Msg msg '%s'\n", msg->msg);
         break;
       default:
         break;
@@ -69,6 +71,7 @@ void *socket_handler(void *arg)
   }/* end of main loop */
 }
 
+/* we should rewrite this function */
 struct args *parse_option(char *s)
 {
   char *token, *save_ptr;
@@ -88,12 +91,8 @@ struct args *parse_option(char *s)
   } else
     goto one_arg;
 
-  token = strtok_r(NULL, " ", &save_ptr);
-  if (token != NULL)
-  {
-    length = strlen(token);
-    goto three_arg;
-  }
+  length = strlen(save_ptr);
+  goto three_arg;
 
 one_arg:
   args = malloc(sizeof(struct args));
@@ -104,9 +103,15 @@ three_arg:
   args = malloc(sizeof(struct args) + length);
   args->command = c;
   strlcpy(args->arg1, str, DEFAULT_NAME_SIZE);
-  strlcpy(args->arg2, token, length);
+  strlcpy(args->arg2, save_ptr, length);
   args->length = length;
+
   return args;
+}
+
+static inline void get_user_input(char *s, int length)
+{
+  fgets(s, length, stdin);
 }
 
 int main(int argc, char *argv[])
@@ -122,16 +127,18 @@ int main(int argc, char *argv[])
   message *msg;
   int length;
 
+  /* do some initialization */
   system("reset");
   print_bannar();
   sfd = initialization(); 
   broadcast_myself(sfd);
   pthread_create(&t, NULL, socket_handler, (void *)&sfd);
-  
+
   while(true)
   {
-    fprintf(stdout, ">");
-    fgets(args, MAX_MSG_SIZE + 32, stdin);
+    fprintf(stderr, ">");
+    fflush(stdout);
+    get_user_input(args, MAX_MSG_SIZE + 32);
     opt = parse_option(args);
     if (opt == NULL)
       continue;
@@ -149,7 +156,7 @@ int main(int argc, char *argv[])
         if (reciver == NULL)
         {
           fprintf(stdout, "No such friends, Please check ;)\n");
-          destory_message(msg);
+          break;
         }
         send_message(sfd, &tm, &length, 
             (struct sockaddr *)&reciver->user_ss);
@@ -167,7 +174,10 @@ int main(int argc, char *argv[])
         break;
     }
     if (quitting)
+    {
+      free(opt);
       break;
+    }
   }
   pthread_join(t, NULL);
 }

@@ -19,7 +19,6 @@ static message *construct_name_msg()
   strlcpy(msg->header.ip, inet_ntoa(m_addr.sin_addr), INET_ADDRSTRLEN);
   msg->header.type = NAME_MSG;
   msg->header.length = 0;
-  printf("name '%s' length '%d'\n", msg->header.name, msg->header.length);
   
   return msg;
 }
@@ -43,11 +42,9 @@ static message *construct_msg_msg(char *str)
 {
   message *msg;
 
-  printf("%s\n", str);
   if (str == NULL)
     return NULL;
   msg = __msg_msg(str);
-  printf("msg '%s' length '%d'\n", msg->msg, msg->header.length);
 
   return msg;
 }
@@ -98,7 +95,6 @@ int send_message(int socket, union tran_message *buffer,
   {
     n = sendto(socket, buffer->str + total, bytesleft, 0,
         addr, sizeof(*addr));
-    printf("%d %d\n", n, *length);
     if (n == -1) 
       break;
     total += n;
