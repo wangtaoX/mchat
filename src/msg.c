@@ -19,6 +19,7 @@ static message *construct_name_msg()
   strlcpy(msg->header.ip, inet_ntoa(m_addr.sin_addr), INET_ADDRSTRLEN);
   msg->header.type = NAME_MSG;
   msg->header.length = 0;
+  printf("name '%s' length '%d'\n", msg->header.name, msg->header.length);
   
   return msg;
 }
@@ -26,7 +27,7 @@ static message *construct_name_msg()
 /* chatting message */
 static message *__msg_msg(char *msg)
 {
-  int length = strlen(msg);
+  int length = strlen(msg) + 1;
   message *mm = (message *)malloc(sizeof(message) + length);
 
   mm->header.length = length;
@@ -42,9 +43,11 @@ static message *construct_msg_msg(char *str)
 {
   message *msg;
 
+  printf("%s\n", str);
   if (str == NULL)
     return NULL;
   msg = __msg_msg(str);
+  printf("msg '%s' length '%d'\n", msg->msg, msg->header.length);
 
   return msg;
 }
@@ -95,6 +98,7 @@ int send_message(int socket, union tran_message *buffer,
   {
     n = sendto(socket, buffer->str + total, bytesleft, 0,
         addr, sizeof(*addr));
+    printf("%d %d\n", n, *length);
     if (n == -1) 
       break;
     total += n;
@@ -115,26 +119,29 @@ message *receive_message(int socket)
   message *msg;
   int length;
 
+  /* use MSG_PEEK to get the length of the message, but it is 
+   * not read the packet */
   addrlen = sizeof(their_addr);
-  if ((numbytes = recvfrom(socket, buffer.str, sizeof(message), 0,
+  if ((numbytes = recvfrom(socket, buffer.str, sizeof(message), MSG_PEEK,
           (struct sockaddr *)&their_addr, &addrlen)) == -1)
   {
     perror("recvfrom");
     exit(0);
   }
   length = buffer.msg.header.length;
-  if (length != 0)
+
+  /* we just read the real message */
+  numbytes = recvfrom(socket, buffer.str, sizeof(message) + length,
+      0, (struct sockaddr *)&their_addr, &addrlen);
+  if (numbytes == -1)
   {
-    numbytes = recvfrom(socket, buffer.str + sizeof(message), length,
-        0, (struct sockaddr *)&their_addr, &addrlen);
-    if (numbytes == -1)
-    {
-      perror("recvfrom");
-      exit(0);
-    }
+    perror("recvfrom");
+    exit(0);
   }
+
   msg = malloc(sizeof(message) + buffer.msg.header.length);
   memcpy((void *)msg, (void *)&buffer, sizeof(message) + length);
+  msg->msg[length - 1] = '\0';
 
   return msg;
 }

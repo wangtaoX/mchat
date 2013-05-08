@@ -52,11 +52,14 @@ void *socket_handler(void *arg)
     switch(msg->header.type)
     {
       case NAME_MSG:
+        printf("recieve Name_Msg\n");
         add_friends(msg);
         break;
       case GROUP_MSG:
+        printf("receive Group_Msg\n");
         break;
       case MSG_MSG:
+        printf("receive Msg_Msg msg '%s'\n", msg->msg);
         break;
       default:
         break;
@@ -150,6 +153,7 @@ int main(int argc, char *argv[])
         }
         send_message(sfd, &tm, &length, 
             (struct sockaddr *)&reciver->user_ss);
+        destory_message(msg);
         break;
       case 'q':
         print_goodbye();
