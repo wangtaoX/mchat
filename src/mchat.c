@@ -56,12 +56,18 @@ void *socket_handler(void *arg)
     msg = receive_message(socket_fd);
     switch(msg->header.type)
     {
+      case NAME_REPLY_MSG:
       case NAME_MSG:
         add_friends(msg);
+        if (msg->header.type & NAME_MSG)
+          reply_name_message(socket_fd, msg->header.name);
         break;
       case GROUP_MSG:
         break;
       case MSG_MSG:
+        break;
+      case OFFLINE_MSG:
+        delete_friends(msg->header.name);
         break;
       default:
         break;
@@ -165,6 +171,8 @@ int main(int argc, char *argv[])
       case 'q':
         print_goodbye();
         quitting = true;
+        reply_offline_message(sfd);
+        free_user_info();
         break;
       case 'h':
         print_help();

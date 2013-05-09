@@ -13,10 +13,11 @@
 #define MAX_MSG_SIZE 150
 
 /* type of msg */
-#define GROUP_MSG 0x0
+#define NAME_REPLY_MSG 0x0
 #define NAME_MSG 0x1
 #define MSG_MSG 0x2
 #define OFFLINE_MSG 0x4
+#define GROUP_MSG 0x8
 
 /* any unreaded message should be in a list */
 struct list unreaded_msg_list;
@@ -48,4 +49,6 @@ void destory_message(message *msg);
 int send_message(int socket, union tran_message *buffer, 
     int *length, struct sockaddr *addr);
 message *receive_message(int socket);
+void reply_name_message(int socket_fd, char *name);
+void reply_offline_message(int sfd);
 #endif

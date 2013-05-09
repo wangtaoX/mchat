@@ -158,8 +158,13 @@ void dump_all_online_friends()
   {
     u = hash_entry(hash_cur(&i), struct user, user_hash_e);
     si = (struct sockaddr_in *)(&u->user_ss);
-    fprintf(stdout, "%s\t\t%s\n", u->user_name, inet_ntoa(si->sin_addr));
+    fprintf(stdout, "%s\t%s\n", u->user_name, inet_ntoa(si->sin_addr));
   }
   
   return;
+}
+
+void free_user_info()
+{
+  hash_destroy(&user_friends, NULL);
 }

@@ -6,18 +6,18 @@ extern struct sockaddr_in m_addr;
 /* private function of msg module */
 static message *construct_msg_msg(char *str);
 static message *__msg_msg(char *msg);
-static message *construct_name_msg();
+static message *construct_name_msg(int type);
 static int message_type(message *msg);
 
 /* the first time a user online should construct
  * this kind of msg */
-static message *construct_name_msg()
+static message *construct_name_msg(int type)
 {
   message *msg = malloc(sizeof(message));
   
   strlcpy(msg->header.name, user_name, DEFAULT_NAME_SIZE);
   strlcpy(msg->header.ip, inet_ntoa(m_addr.sin_addr), INET_ADDRSTRLEN);
-  msg->header.type = NAME_MSG;
+  msg->header.type = type;
   msg->header.length = 0;
   
   return msg;
@@ -62,10 +62,16 @@ message *construct_msg(int type, char *msg)
 
   switch(type) {
     case NAME_MSG:
-      m = construct_name_msg();
+      m = construct_name_msg(NAME_MSG);
+      break;
+    case NAME_REPLY_MSG:
+      m = construct_name_msg(NAME_REPLY_MSG);
       break;
     case MSG_MSG:
       m = construct_msg_msg(msg);
+      break;
+    case OFFLINE_MSG:
+      m = construct_name_msg(OFFLINE_MSG);
       break;
     default:
       break;
@@ -140,4 +146,59 @@ message *receive_message(int socket)
   msg->msg[length - 1] = '\0';
 
   return msg;
+}
+
+/* when receive a name message, we should *
+ * reply a name message                   */
+void reply_name_message(int socket_fd, char *name)
+{
+  struct user *receiver;
+  message *nm;
+  int numbytes, length;
+  union tran_message buffer;
+  
+  receiver = search_friends(name);
+  if (receiver == NULL)
+    return;
+
+  nm = construct_msg(NAME_REPLY_MSG, NULL);
+  length = sizeof(message);
+  memcpy((void *)&buffer, (void *)nm, length);
+  if ((numbytes = send_message(socket_fd, &buffer, &length, 
+        (struct sockaddr *)&(receiver->user_ss))) == -1)
+  {
+    perror("sendto");
+    exit(0);
+  }
+  destory_message(nm);
+}
+
+/* offline message */
+void reply_offline_message(int socket_fd)
+{
+  struct user *receiver;
+  struct hash_iterator i;
+  union tran_message buffer;
+  message *msg;
+  int length = sizeof(message);
+  int numbytes;
+
+  /* no friends here */
+  if (hash_empty(&user_friends))
+    return;
+
+  msg = construct_msg(OFFLINE_MSG, NULL);
+  memcpy((void *)&buffer, (void *)msg, length);
+  hash_first(&i, &user_friends);
+  while(hash_next(&i))
+  {
+    receiver = hash_entry(hash_cur(&i), struct user, user_hash_e);
+    if ((numbytes = send_message(socket_fd, &buffer, &length, 
+          (struct sockaddr *)&(receiver->user_ss))) == -1)
+    {
+      perror("sendto");
+      exit(0);
+    }
+  }
+  destory_message(msg);
 }

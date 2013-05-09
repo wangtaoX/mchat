@@ -39,4 +39,5 @@ size_t friends_cnt();
 bool is_inchatting(char *name);
 bool is_myself(char *ip);
 void dump_all_online_friends();
+void free_user_info();
 #endif
