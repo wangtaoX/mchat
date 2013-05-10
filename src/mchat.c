@@ -1,6 +1,7 @@
 #include <pthread.h>
 #include <unistd.h>
 #include <stdlib.h>
+#include <ncurses.h>
 #include "user.h"
 #include "msg.h"
 #include "socket.h"
@@ -20,8 +21,9 @@ typedef struct args
 extern char user_name[DEFAULT_NAME_SIZE];
 extern struct sockaddr_in b_addr, m_addr;
 
+bool quitting = false;
 static void parse_user_info();
-static inline void get_user_input(char *s, int length);
+static inline void get_user_input(char *s);
 
 static inline void parse_user_info()
 {
@@ -42,13 +44,12 @@ int initialization()
   return sfd;
 }
 
+/* we should use non-blocking socket to receive 
+ * data packet */
 void *socket_handler(void *arg)
 {
   int socket_fd = *((int *)arg);
-  int numbytes;
   message *msg;
-  char buf[MAX_MSG_SIZE];
-  union tran_message buffer;
   
   /* listener thread main loop */
   for (;;)
@@ -115,26 +116,26 @@ three_arg:
   return args;
 }
 
-static inline void get_user_input(char *s, int length)
+static inline void get_user_input(char *s)
 {
-  fgets(s, length, stdin);
+  getstr(s);
 }
 
 int main(int argc, char *argv[])
 {
-  int sfd;
-  struct sockaddr_in b_addr, m_addr;
   pthread_t t;
   char args[MAX_MSG_SIZE + 32];
-  bool quitting = false;
   struct args *opt;
   union tran_message tm;
   struct user *reciver;
   message *msg;
-  int length;
+  int length, sfd;
+  int row, col, maxrow;
 
   /* do some initialization */
-  system("reset");
+  initscr();
+  getmaxyx(stdscr, maxrow, col);
+  getyx(stdscr, row, col);
   print_bannar();
   sfd = initialization(); 
   broadcast_myself(sfd);
@@ -142,10 +143,14 @@ int main(int argc, char *argv[])
 
   while(true)
   {
-    fprintf(stderr, ">");
-    fflush(stdout);
-    get_user_input(args, MAX_MSG_SIZE + 32);
-    opt = parse_option(args);
+    if (row == maxrow - 1)
+      clear();
+    printw(">");
+    get_user_input(args);
+    if (strlen(args) != 0)
+      opt = parse_option(args);
+    else
+      continue;
     if (opt == NULL)
       continue;
     switch(opt->command) 
@@ -161,12 +166,15 @@ int main(int argc, char *argv[])
         reciver = search_friends(opt->arg1);
         if (reciver == NULL)
         {
-          fprintf(stdout, "No such friends, Please check ;)\n");
+          printw("No such friends, Please check ;)\n");
           break;
         }
         send_message(sfd, &tm, &length, 
             (struct sockaddr *)&reciver->user_ss);
         destory_message(msg);
+        break;
+      case 'h':
+        print_help();
         break;
       case 'q':
         print_goodbye();
@@ -174,11 +182,8 @@ int main(int argc, char *argv[])
         reply_offline_message(sfd);
         free_user_info();
         break;
-      case 'h':
-        print_help();
-        break;
       default:
-        fprintf(stdout, "Unknown option, Please use h(help) to get help ;)\n");
+        printw("Unknown option, Please use h(help) to get help ;)\n");
         break;
     }
     if (quitting)
@@ -186,7 +191,12 @@ int main(int argc, char *argv[])
       free(opt);
       break;
     }
+    getyx(stdscr, row, col);
   }
-  pthread_join(t, NULL);
+  refresh();
+  endwin();
+  //pthread_join(t, NULL);
+
+  return true;
 }
 

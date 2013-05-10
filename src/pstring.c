@@ -1,5 +1,5 @@
 #include "pstring.h"
-#include <stdio.h>
+#include <ncurses.h>
 
 const char *welcome_str =  "Welcome to the use mchat server,\
  Use -h to get the help documentation\n";
@@ -9,14 +9,14 @@ const char *help = "-l list all online friends\n\
 
 void print_help()
 {
- fprintf(stdout, help);
+  printw("%s", help);
 }
 
 void print_bannar()
 {
-  fprintf(stdout, welcome_str);
+  printw("%s", welcome_str);
 }
 void print_goodbye()
 {
-  fprintf(stdout, "Goodbye ;)\n");
+  printw("Goodbye ;)\n");
 }

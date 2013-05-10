@@ -3,6 +3,7 @@
 
 #include <netinet/in.h>
 #include <stdbool.h>
+#include <ncurses.h>
 #include "socket.h"
 #include "../lib/list.h"
 #include "../lib/hash.h"

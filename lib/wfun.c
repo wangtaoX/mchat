@@ -11,6 +11,8 @@ int w_getaddrinfo(char *node, char *service,
     fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(rv));
     exit(1);
   }
+
+  return rv;
 }
 
 /* Wrap the function [socket] */
