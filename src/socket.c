@@ -1,4 +1,5 @@
 #include "socket.h"
+#include <strings.h>
 
 extern struct sockaddr_in b_addr;
 /* make a socket with option SO_BROADCAST */

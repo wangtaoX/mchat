@@ -148,18 +148,24 @@ void dump_all_online_friends()
 
   if (hash_empty(&user_friends))
   {
-    fprintf(stdout, "No friends online ;(\n");
+    printw("No friends online ;(\n");
+    //fprintf(stdout, "No friends online ;(\n");
     return;
   }
-  fprintf(stdout, "User Name\tIP\n");
+  printw("User Name\tIP\n");
   /* iterate all friends in hash table */
   hash_first(&i, &user_friends);
   while(hash_next(&i))
   {
     u = hash_entry(hash_cur(&i), struct user, user_hash_e);
     si = (struct sockaddr_in *)(&u->user_ss);
-    fprintf(stdout, "%s\t\t%s\n", u->user_name, inet_ntoa(si->sin_addr));
+    printw("%s\t%s\n", u->user_name, inet_ntoa(si->sin_addr));
   }
   
   return;
+}
+
+void free_user_info()
+{
+  hash_destroy(&user_friends, NULL);
 }

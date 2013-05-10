@@ -3,6 +3,7 @@
 
 #include <netinet/in.h>
 #include <stdbool.h>
+#include <ncurses.h>
 #include "socket.h"
 #include "../lib/list.h"
 #include "../lib/hash.h"
@@ -39,4 +40,5 @@ size_t friends_cnt();
 bool is_inchatting(char *name);
 bool is_myself(char *ip);
 void dump_all_online_friends();
+void free_user_info();
 #endif
