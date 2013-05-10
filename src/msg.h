@@ -51,4 +51,5 @@ int send_message(int socket, union tran_message *buffer,
 message *receive_message(int socket);
 void reply_name_message(int socket_fd, char *name);
 void reply_offline_message(int sfd);
+void dump_message(message *msg);
 #endif

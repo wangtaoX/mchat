@@ -202,3 +202,12 @@ void reply_offline_message(int socket_fd)
   }
   destory_message(msg);
 }
+
+void dump_message(message *msg)
+{
+  if (msg == NULL)
+    return;
+
+  printw("\nMessage from %s: %s\n", msg->header.name, msg->msg);
+  return;
+}

@@ -66,6 +66,7 @@ void *socket_handler(void *arg)
       case GROUP_MSG:
         break;
       case MSG_MSG:
+        dump_message(msg);
         break;
       case OFFLINE_MSG:
         delete_friends(msg->header.name);
@@ -110,8 +111,8 @@ three_arg:
   args = malloc(sizeof(struct args) + length);
   args->command = c;
   strlcpy(args->arg1, str, DEFAULT_NAME_SIZE);
-  strlcpy(args->arg2, save_ptr, length);
-  args->length = length;
+  strlcpy(args->arg2, save_ptr, length + 1);
+  args->length = length + 1;
 
   return args;
 }
